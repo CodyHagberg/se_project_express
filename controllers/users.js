@@ -11,9 +11,9 @@ const getUsers = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { username, avatar } = req.body;
+  const { name, avatar } = req.body;
 
-  User.create({ username, avatar })
+  User.create({ name, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       console.error(err);
@@ -30,14 +30,14 @@ const getUser = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: err.message });
+        return res.status(404).send({ message: 'User not found' });
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: err.message });
+        return res.status(400).send({ message: 'Invalid user id' });
       }
       return res.status(500).send({ message: err.message });
     });
