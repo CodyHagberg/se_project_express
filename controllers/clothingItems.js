@@ -5,7 +5,7 @@ const {
   INTERNAL_SERVER_ERROR,
   CREATED,
   OK,
-} = require('../errors');
+} = require('../utils/errors');
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;

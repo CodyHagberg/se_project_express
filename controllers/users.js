@@ -5,7 +5,7 @@ const {
   INTERNAL_SERVER_ERROR,
   CREATED,
   OK,
-} = require('../errors');
+} = require('../utils/errors');
 
 // Get all users
 const getUsers = (req, res) => {
