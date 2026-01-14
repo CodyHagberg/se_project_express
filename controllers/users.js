@@ -25,16 +25,22 @@ const createUser = (req, res) => {
 };
 
 const getUser = (req, res) => {
-const { userId } = req.params;
+  const { userId } = req.params;
+
   User.findById(userId)
-  .then((user) => res.status(200).send(user))
-  .catch((err) => {
-    console.error(err);
-    if (err.name === 'CastError') {
-      return res.status(400).send({ message: err.message });
-    }
-    return res.status(500).send({ message: err.message });
-  });
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: err.message });
+      }
+      return res.status(200).send(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: err.message });
+      }
+      return res.status(500).send({ message: err.message });
+    });
 };
 
 module.exports = { getUsers, createUser, getUser };
