@@ -1,25 +1,32 @@
 const ClothingItem = require('../models/clothingItem');
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+  CREATED,
+  OK,
+} = require('../errors');
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl })
-    .then((item) => res.status(201).send(item))
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
+    .then((item) => res.status(CREATED).send(item))
     .catch((err) => {
       console.error(err);
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: err.message });
+        return res.status(BAD_REQUEST).send({ message: err.message });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
 };
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.status(OK).send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -29,22 +36,22 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(id)
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: 'Item not found' });
+        return res.status(NOT_FOUND).send({ message: 'Item not found' });
       }
-      return res.status(200).send({ message: 'Clothing item deleted successfully' });
+      return res.status(OK).send({ message: 'Clothing item deleted successfully' });
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Invalid item id' });
+        return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
 };
 
 const likeItem = (req, res) => {
   const { itemId } = req.params;
-  const userId = '6966ffe96711ba4eb3974b16';
+  const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -53,22 +60,22 @@ const likeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: 'Item not found' });
+        return res.status(NOT_FOUND).send({ message: 'Item not found' });
       }
-      return res.status(200).send(item);
+      return res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Invalid item id' });
+        return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
 };
 
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
-  const userId = '6966ffe96711ba4eb3974b16';
+  const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -77,16 +84,16 @@ const unlikeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: 'Item not found' });
+        return res.status(NOT_FOUND).send({ message: 'Item not found' });
       }
-      return res.status(200).send(item);
+      return res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Invalid item id' });
+        return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
 };
 
