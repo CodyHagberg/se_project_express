@@ -19,6 +19,22 @@ const userSchema = new mongoose.Schema({
       message: 'Invalid URL format for avatar',
     },
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator(value) {
+        return validator.isEmail(value);
+      },
+      message: 'Invalid email format',
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
 });
 
 module.exports = mongoose.model('user', userSchema);
