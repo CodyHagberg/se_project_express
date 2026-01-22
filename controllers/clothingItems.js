@@ -33,6 +33,7 @@ const getItems = (req, res) => {
 const deleteItem = (req, res) => {
   const { id } = req.params;
 
+  // Find the item first
   ClothingItem.findById(id)
     .then((item) => {
       if (!item) {
@@ -43,16 +44,19 @@ const deleteItem = (req, res) => {
         return res.status(403).send({ message: 'Forbidden: not the owner' });
       }
 
-      return item.remove().then(() => {
-        res.status(OK).send({ message: 'Clothing item deleted successfully' });
-      });
+      return ClothingItem.findByIdAndDelete(id)
+        .then(() =>
+          res.status(OK).send({ message: 'Clothing item deleted successfully' })
+        );
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Server error' });
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: 'Server error' });
     });
 };
 
