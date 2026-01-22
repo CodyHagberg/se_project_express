@@ -2,6 +2,7 @@ const ClothingItem = require('../models/clothingItem');
 const {
   BAD_REQUEST,
   NOT_FOUND,
+  CONFLICT,
   INTERNAL_SERVER_ERROR,
   CREATED,
   OK,
