@@ -9,7 +9,7 @@ const {
   INTERNAL_SERVER_ERROR,
   CREATED,
   OK,
-  UNATHORIZED,
+  UNAUTHORIZED,
 } = require('../utils/errors');
 
 // SIGN UP
@@ -63,7 +63,7 @@ const login = (req, res) => {
      return res.send({ token });
     })
     .catch(() =>
-      res.status(UNATHORIZED).send({ message: 'Invalid email or password' })
+      res.status(UNAUTHORIZED).send({ message: 'Invalid email or password' })
     );
 };
 
