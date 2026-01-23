@@ -8,7 +8,7 @@ const { NOT_FOUND } = require('../utils/errors');
 // public routes
 router.post('/signin', login);
 router.post('/signup', createUser);
-router.get('/items', clothingItemRouter);
+router.use('/items', clothingItemRouter);
 
 // protect everything below
 router.use(auth);

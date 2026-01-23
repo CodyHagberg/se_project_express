@@ -5,6 +5,7 @@ const {
   INTERNAL_SERVER_ERROR,
   CREATED,
   OK,
+  FORBIDDEN,
 } = require('../utils/errors');
 
 const createItem = (req, res) => {
@@ -41,7 +42,7 @@ const deleteItem = (req, res) => {
       }
 
       if (!item.owner.equals(req.user._id)) {
-        return res.status(403).send({ message: 'Forbidden: not the owner' });
+        return res.status(FORBIDDEN).send({ message: 'Forbidden: not the owner' });
       }
 
       return ClothingItem.findByIdAndDelete(id)
