@@ -10,7 +10,7 @@ const OK = 200;
 
 module.exports = {
   BAD_REQUEST,
-  UNATHORIZED,
+  UNAUTHORIZED,
   FORBIDDEN,
   NOT_FOUND,
   CONFLICT,
