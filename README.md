@@ -17,3 +17,7 @@ Postman — API testing
 
 ##### Description 
 The WTWR back-end server stores and manages information for users and clothing items. It receives requests from the front-end application and responds with clothing suggestions based on temperature. Data is stored in a database rather than being hard-coded, allowing dynamic updates and scalability.
+
+
+###### Video 
+ https://drive.google.com/file/d/15dxfxhoezii15h0AEgQMnKEZJVdHHc_V/view?usp=sharing
