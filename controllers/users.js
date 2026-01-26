@@ -32,6 +32,7 @@ const createUser = (req, res) => {
       res.status(CREATED).send(userObj);
     })
     .catch((err) => {
+      console.error(err);
       if (err.code === 11000) {
         return res.status(CONFLICT).send({ message: 'Email already exists' });
       }
@@ -62,9 +63,15 @@ const login = (req, res) => {
 
      return res.send({ token });
     })
-    .catch(() =>
-      res.status(UNAUTHORIZED).send({ message: 'Invalid email or password' })
-    );
+    .catch((err) => {
+      console.error(err);
+    if (err.message === 'Incorrect email or password') {
+      return res.status(UNAUTHORIZED).send({ message: err.message });
+    }
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: 'Server error' });
+  });
 };
 
 // GET CURRENT USER
@@ -74,7 +81,7 @@ const getCurrentUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: 'User not found' });
       }
-      return res.status(OK).send(user);
+      return res.send(user);
     })
     .catch(() =>
       res
