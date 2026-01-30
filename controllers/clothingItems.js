@@ -1,11 +1,11 @@
 const ClothingItem = require('../models/clothingItem');
+const BadRequestError = require('../errors/bad-request-err');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
   CREATED,
   OK,
-  FORBIDDEN,
+  INTERNAL_SERVER_ERROR,
 } = require('../utils/errors');
 
 const createItem = (req, res) => {
@@ -16,7 +16,7 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+        return res.status(BadRequestError).send({ message: "Invalid data" });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
@@ -38,11 +38,11 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(id)
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: 'Item not found' });
+        return res.status(NotFoundError).send({ message: 'Item not found' });
       }
 
       if (!item.owner.equals(req.user._id)) {
-        return res.status(FORBIDDEN).send({ message: 'Forbidden: not the owner' });
+        return res.status(ForbiddenError).send({ message: 'Forbidden: not the owner' });
       }
 
       return ClothingItem.findByIdAndDelete(id)
@@ -53,7 +53,7 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
+        return res.status(BadRequestError).send({ message: 'Invalid item id' });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
@@ -72,14 +72,14 @@ const likeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: 'Item not found' });
+        return res.status(NotFoundError).send({ message: 'Item not found' });
       }
       return res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
+        return res.status(BadRequestError).send({ message: 'Invalid item id' });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
@@ -96,14 +96,14 @@ const unlikeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND).send({ message: 'Item not found' });
+        return res.status(NotFoundError).send({ message: 'Item not found' });
       }
       return res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: 'Invalid item id' });
+        return res.status(BadRequestError).send({ message: 'Invalid item id' });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
     });
