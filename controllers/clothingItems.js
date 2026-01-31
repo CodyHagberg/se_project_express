@@ -62,11 +62,11 @@ const deleteItem = (req, res) => {
 };
 
 const likeItem = (req, res) => {
-  const { itemId } = req.params;
+  const { id } = req.params;
   const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
-    itemId,
+    id,
     { $addToSet: { likes: userId } },
     { new: true }
   )
@@ -86,11 +86,11 @@ const likeItem = (req, res) => {
 };
 
 const unlikeItem = (req, res) => {
-  const { itemId } = req.params;
+  const { id } = req.params;
   const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
-    itemId,
+    id,
     { $pull: { likes: userId } },
     { new: true }
   )
