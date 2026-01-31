@@ -1,7 +1,7 @@
 const { Joi, celebrate } = require('celebrate');
-const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 const validator = require('validator');
 
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
@@ -10,7 +10,7 @@ const validateURL = (value, helpers) => {
   return helpers.message('Invalid URL format');
 };
 
-const validateClothingItem= celebrate({
+const validateClothingItem = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
       'string.empty': 'The "name" field must be filled in',
