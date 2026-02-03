@@ -1,11 +1,10 @@
 const ClothingItem = require('../models/clothingItem');
 const BadRequestError = require('../errors/bad-request-err');
 const NotFoundError = require('../errors/not-found-err');
-const ForbiddenError = require('../errors/forbidden-err');
+const UnauthorizedError = require('../errors/unauthorized-err');
 const {
   CREATED,
   OK,
-  INTERNAL_SERVER_ERROR,
 } = require('../utils/errors');
 
 const createItem = (req, res) => {
@@ -16,9 +15,9 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === 'ValidationError') {
-        return res.status(BadRequestError).send({ message: "Invalid data" });
+        throw new BadRequestError('Invalid data for creating clothing item');
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
+      throw err;
     });
 };
 
@@ -26,86 +25,82 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(OK).send(items))
     .catch((err) => {
-      console.error(err);
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
+      throw err;
     });
 };
 
 const deleteItem = (req, res) => {
-  const { id } = req.params;
+  const { itemId } = req.params;
 
   // Find the item first
-  ClothingItem.findById(id)
+  ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
-        return res.status(NotFoundError).send({ message: 'Item not found' });
+        throw new NotFoundError('Clothing item not found');
       }
 
       if (!item.owner.equals(req.user._id)) {
-        return res.status(ForbiddenError).send({ message: 'Forbidden: not the owner' });
+        throw new UnauthorizedError('You are not authorized to delete this item');
       }
 
-      return ClothingItem.findByIdAndDelete(id)
+      return ClothingItem.findByIdAndDelete(itemId)
         .then(() =>
           res.status(OK).send({ message: 'Clothing item deleted successfully' })
         );
     })
     .catch((err) => {
-      console.error(err);
       if (err.name === 'CastError') {
-        return res.status(BadRequestError).send({ message: 'Invalid item id' });
+        throw new BadRequestError('Invalid item id');
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: 'Server error' });
+      throw err;
     });
 };
 
 const likeItem = (req, res) => {
-  const { id } = req.params;
+  const { itemId } = req.params;
   const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
-    id,
+    itemId,
     { $addToSet: { likes: userId } },
     { new: true }
   )
     .then((item) => {
       if (!item) {
-        return res.status(NotFoundError).send({ message: 'Item not found' });
+        throw new NotFoundError('Item not found');
       }
       return res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(BadRequestError).send({ message: 'Invalid item id' });
+        throw new BadRequestError('Invalid item id');
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
+      throw err;
     });
 };
 
 const unlikeItem = (req, res) => {
-  const { id } = req.params;
+  const { itemId } = req.params;
   const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
-    id,
+    itemId,
     { $pull: { likes: userId } },
     { new: true }
   )
     .then((item) => {
       if (!item) {
-        return res.status(NotFoundError).send({ message: 'Item not found' });
+        throw new NotFoundError('Item not found');
       }
       return res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        return res.status(BadRequestError).send({ message: 'Invalid item id' });
+        throw new BadRequestError('Invalid item id');
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An error has occurred on the server" });
+      throw err;
     });
 };
 

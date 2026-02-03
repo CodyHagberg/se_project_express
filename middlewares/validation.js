@@ -73,9 +73,15 @@ const validateProfileUpdate = celebrate ({
   }).min(1),
 });
 
-const validateItemId = celebrate ({
+const validateItemId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().required().pattern(objectIdRegex),
+    itemID: Joi.string()
+      .required()
+      .pattern(objectIdRegex)
+      .messages({
+        'string.empty': 'The "itemID" parameter must be provided',
+        'string.pattern.base': 'The "itemID" must be a valid MongoDB ObjectId',
+      }),
   }),
 });
 
