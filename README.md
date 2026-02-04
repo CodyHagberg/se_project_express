@@ -21,6 +21,7 @@ The WTWR back-end server stores and manages information for users and clothing i
 
 ###### Video 
  [link name](https://drive.google.com/file/d/15dxfxhoezii15h0AEgQMnKEZJVdHHc_V/view?usp=sharing)
+ [newVideo](https://drive.google.com/file/d/1om2aIJX0bg37trL49nkiA9XUs9Fc6eVp/view?usp=sharing)
 
 ###### Domain Name
 [link name](https://wearthatweatherradar.csproject.org/)
