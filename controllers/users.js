@@ -35,10 +35,9 @@ const createUser = (req, res, next) => {
       if (err.code === 11000) {
        return next(new ConflictError('User with this email already exists'));
       }
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Invalid data for user creation'));
-      }
-      return next(err);
+      return err.name === 'ValidationError'
+        ? next(new BadRequestError('Invalid data for user creation'))
+        : next(err);
     });
 };
 
@@ -51,58 +50,45 @@ const login = (req, res, next) => {
   }
 
   return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-
-     return res.send({ token });
-    })
-    .catch((err) => {
-      console.error(err);
-    if (err.message === 'Incorrect email or password') {
-      return next(new UnauthorizedError('Incorrect email or password'));
-    }
-    return next(err);
-  });
+    .then((user) =>
+      res.send({
+        token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
+      })
+    )
+    .catch((err) =>
+      err.message === 'Incorrect email or password'
+        ? next(new UnauthorizedError('Incorrect email or password'))
+        : next(err)
+    );
 };
 
 // GET CURRENT USER
-const getCurrentUser = (req, res, next) => {
+const getCurrentUser = (req, res, next) =>
   User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('User not found'));
-      }
-      res.send(user);
-    })
-    .catch((err) => next(err));
-};
+    .then((user) => (user ? res.send(user) : next(new NotFoundError('User not found'))))
+    .catch(next);
 
 // UPDATE PROFILE
 const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('User not found'));
-      }
-      res.status(OK).send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Invalid data for profile update'));
-      }
-      return next(err);
-    });
+    .then(user =>
+      user
+        ? res.status(OK).send(user)
+        : next(new NotFoundError('User not found'))
+    )
+    .catch(err =>
+      err.name === 'ValidationError'
+        ? next(new BadRequestError('Invalid data for profile update'))
+        : next(err)
+    );
 };
+
 
 module.exports = {
   createUser,

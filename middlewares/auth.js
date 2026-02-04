@@ -16,6 +16,6 @@ module.exports = (req, res, next) => {
     req.user = payload;
     return next();
   } catch (err) {
-    next(new UnauthorizedError('Authorization required'));
+    return next(new UnauthorizedError('Authorization required'));
   }
 };

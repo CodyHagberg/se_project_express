@@ -1,7 +1,6 @@
 const ClothingItem = require('../models/clothingItem');
 const BadRequestError = require('../errors/bad-request-err');
 const NotFoundError = require('../errors/not-found-err');
-const UnauthorizedError = require('../errors/unauthorized-err');
 const ForbiddenError = require('../errors/forbidden-err');
 const {
   CREATED,
@@ -11,29 +10,26 @@ const {
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
+  return ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.status(CREATED).send(item))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Invalid data for clothing item creation'));
-      }
-      return next(err);
-    });
+    .catch((err) =>
+      err.name === 'ValidationError'
+        ? next(new BadRequestError('Invalid data for creating clothing item'))
+        : next(err)
+    );
 };
 
-const getItems = (req, res, next) => {
+const getItems = (req, res, next) =>
   ClothingItem.find({ owner: req.user._id })
     .then((items) => res.status(OK).send(items))
-    .catch((err) => next(err));
-};
+    .catch(next);
 
 
 const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   // Find the item first
-  ClothingItem.findById(itemId)
+  return ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
         return next(new NotFoundError('Item not found'));
@@ -48,60 +44,51 @@ const deleteItem = (req, res, next) => {
           res.status(OK).send({ message: 'Clothing item deleted successfully' })
         );
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Invalid item id'));
-      }
-      return next(err);
-    });
+    .catch((err) =>
+      err.name === 'CastError' ? next(new BadRequestError('Invalid item id')) : next(err)
+    );
 };
 
 const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  ClothingItem.findByIdAndUpdate(
+  return ClothingItem.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: userId } },
     { new: true }
   )
-    .then((item) => {
-      if (!item) {
-        return next(new NotFoundError('Item not found'));
-      }
-      res.status(OK).send(item);
-    })
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Invalid item id'));
-      }
-      return next(err);
-    });
+    .then(item =>
+      item
+        ? res.status(OK).send(item)
+        : next(new NotFoundError('Item not found'))
+    )
+    .catch(err =>
+      err.name === 'CastError'
+        ? next(new BadRequestError('Invalid item id'))
+        : next(err)
+    );
 };
 
 const unlikeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  ClothingItem.findByIdAndUpdate(
+  return ClothingItem.findByIdAndUpdate(
     itemId,
     { $pull: { likes: userId } },
     { new: true }
   )
-    .then((item) => {
-      if (!item) {
-        return next(new NotFoundError('Item not found'));
-      }
-      res.status(OK).send(item);
-    })
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Invalid item id'));
-      }
-      return next(err);
-    });
+    .then(item =>
+      item
+        ? res.status(OK).send(item)
+        : next(new NotFoundError('Item not found'))
+    )
+    .catch(err =>
+      err.name === 'CastError'
+        ? next(new BadRequestError('Invalid item id'))
+        : next(err)
+    );
 };
 
 module.exports = { createItem, getItems, deleteItem, likeItem, unlikeItem };
