@@ -14,8 +14,8 @@ router.use('/items', clothingItemRouter);
 
 
 
-router.use(() => {
-   throw new NotFoundError('Requested resource not found');
+router.use((req, res, next) => {
+  next(new NotFoundError('Requested resource not found'));
 });
 
 module.exports = router;

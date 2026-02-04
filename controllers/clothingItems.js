@@ -2,12 +2,13 @@ const ClothingItem = require('../models/clothingItem');
 const BadRequestError = require('../errors/bad-request-err');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
+const ForbiddenError = require('../errors/forbidden-err');
 const {
   CREATED,
   OK,
 } = require('../utils/errors');
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
@@ -15,32 +16,30 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Invalid data for creating clothing item');
+        return next(new BadRequestError('Invalid data for clothing item creation'));
       }
-      throw err;
+      return next(err);
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(OK).send(items))
-    .catch((err) => {
-      throw err;
-    });
+    .catch((err) => next(err));
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   // Find the item first
   ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
-        throw new NotFoundError('Clothing item not found');
+        return next(new NotFoundError('Item not found'));
       }
 
       if (!item.owner.equals(req.user._id)) {
-        throw new UnauthorizedError('You are not authorized to delete this item');
+        return next(new ForbiddenError('You do not have permission to delete this item'));
       }
 
       return ClothingItem.findByIdAndDelete(itemId)
@@ -50,13 +49,13 @@ const deleteItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Invalid item id');
+        return next(new BadRequestError('Invalid item id'));
       }
-      throw err;
+      return next(err);
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -67,20 +66,20 @@ const likeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        throw new NotFoundError('Item not found');
+        return next(new NotFoundError('Item not found'));
       }
-      return res.status(OK).send(item);
+      res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        throw new BadRequestError('Invalid item id');
+        return next(new BadRequestError('Invalid item id'));
       }
-      throw err;
+      return next(err);
     });
 };
 
-const unlikeItem = (req, res) => {
+const unlikeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -91,16 +90,16 @@ const unlikeItem = (req, res) => {
   )
     .then((item) => {
       if (!item) {
-        throw new NotFoundError('Item not found');
+        return next(new NotFoundError('Item not found'));
       }
-      return res.status(OK).send(item);
+      res.status(OK).send(item);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'CastError') {
-        throw new BadRequestError('Invalid item id');
+        return next(new BadRequestError('Invalid item id'));
       }
-      throw err;
+      return next(err);
     });
 };
 

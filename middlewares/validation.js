@@ -75,7 +75,7 @@ const validateProfileUpdate = celebrate ({
 
 const validateItemId = celebrate({
   params: Joi.object().keys({
-    itemID: Joi.string()
+    itemId: Joi.string()
       .required()
       .pattern(objectIdRegex)
       .messages({
