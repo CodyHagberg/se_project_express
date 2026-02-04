@@ -23,7 +23,7 @@ const createItem = (req, res, next) => {
 };
 
 const getItems = (req, res, next) => {
-  ClothingItem.find({})
+  ClothingItem.find({ owner: req.user._id })
     .then((items) => res.status(OK).send(items))
     .catch((err) => next(err));
 };
