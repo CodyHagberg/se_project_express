@@ -3,7 +3,7 @@ const auth = require('../middlewares/auth');
 const { createItem, getItems, deleteItem, likeItem, unlikeItem} = require('../controllers/clothingItems');
 const {validateClothingItem, validateItemId} = require('../middlewares/validation');
 
-router.get("/", auth, getItems);
+router.get("/", getItems);
 router.post("/", auth, validateClothingItem, createItem);
 router.delete("/:itemId", auth, validateItemId, deleteItem);
 
